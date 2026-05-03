@@ -17,31 +17,13 @@ namespace _06_RapidApiHotelProject.Controllers
         [HttpGet]
         public async Task<IActionResult> HotelList()
         {
-            var client = _httpClientFactory.CreateClient();
-            var request = new HttpRequestMessage
-            {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri("https://booking-com15.p.rapidapi.com/api/v1/hotels/searchHotels?dest_id=-782831&search_type=CITY&arrival_date=2026-04-29&departure_date=2026-05-01&adults=1&children_age=0%2C17&room_qty=1&page_number=1&units=metric&temperature_unit=c&languagecode=en-us&currency_code=EUR&location=US"),
-                Headers =
-    {
-        { "x-rapidapi-key", _configuration["RapidApi2:ApiKey2"] },
-        { "x-rapidapi-host", "booking-com15.p.rapidapi.com" },
-    },
-            };
-            using (var response = await client.SendAsync(request))
-            {
-                response.EnsureSuccessStatusCode();
-                var body = await response.Content.ReadAsStringAsync();
-                var hotels = JsonSerializer.Deserialize<GetHotels.Rootobject>(body);
-                ViewBag.Hotels = hotels;
-            }
             return View();
         }
         [HttpPost]
         public async Task<IActionResult> HotelList(string city, string checkIn, string checkOut, int adults, string currency, string language, int minPrice, int maxPrice)
         {
             //destination id alma
-            var apiKey = "bd4e3ecea8msh0ffa3afe552a2f7p104adajsnc2ffdf07dc7c";
+            var apiKey = _configuration["RapidApi2:ApiKey2"];
             var host = "booking-com15.p.rapidapi.com";
 
             var client = _httpClientFactory.CreateClient();
