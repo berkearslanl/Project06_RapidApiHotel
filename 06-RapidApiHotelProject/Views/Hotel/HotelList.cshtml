@@ -1,0 +1,633 @@
+@{
+
+    Layout = null;
+    ViewData["Title"] = "Hotels";
+
+    var hotels = ViewBag.Hotels as GetHotels.Rootobject;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hotels — Find Your Perfect Stay</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --accent-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f5f7fb;
+            background-image: radial-gradient(at 0% 0%, rgba(102,126,234,0.08) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(245,87,108,0.08) 0px, transparent 50%);
+            min-height: 100vh;
+            color: #2c3e50;
+        }
+
+        /* Header */
+        .page-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 2.5rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 32px 32px;
+            box-shadow: 0 10px 40px rgba(102,126,234,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+            .page-header::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                right: -10%;
+                width: 400px;
+                height: 400px;
+                background: rgba(255,255,255,0.1);
+                border-radius: 50%;
+            }
+
+            .page-header::after {
+                content: '';
+                position: absolute;
+                bottom: -30%;
+                left: -5%;
+                width: 250px;
+                height: 250px;
+                background: rgba(255,255,255,0.08);
+                border-radius: 50%;
+            }
+
+            .page-header h1 {
+                font-weight: 800;
+                font-size: 2.5rem;
+                letter-spacing: -1px;
+                margin-bottom: 0.5rem;
+            }
+
+            .page-header p {
+                opacity: 0.9;
+                font-weight: 400;
+                font-size: 1.1rem;
+            }
+
+        .header-flex {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.85rem 1.75rem;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            color: white;
+            text-decoration: none;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: 1.5px solid rgba(255,255,255,0.25);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+            .back-btn:hover {
+                background: white;
+                color: #667eea;
+                transform: translateY(-2px);
+                box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            }
+
+        /* Filter Card */
+        .filter-card {
+            background: white;
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+            border: 1px solid rgba(102,126,234,0.08);
+        }
+
+        .filter-title {
+            font-weight: 700;
+            font-size: 1.15rem;
+            color: #1a1d29;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+            .filter-title i {
+                width: 36px;
+                height: 36px;
+                background: var(--primary-gradient);
+                color: white;
+                border-radius: 10px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1rem;
+            }
+
+        .form-label-custom {
+            font-weight: 600;
+            font-size: 0.78rem;
+            color: #5a6478;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.4rem;
+        }
+
+        .form-control-custom, .form-select-custom {
+            border: 1.5px solid #e8eaef;
+            border-radius: 12px;
+            padding: 0.7rem 1rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            background: #fafbfc;
+        }
+
+            .form-control-custom:focus, .form-select-custom:focus {
+                border-color: #667eea;
+                box-shadow: 0 0 0 4px rgba(102,126,234,0.1);
+                background: white;
+                outline: none;
+            }
+
+        .input-icon-wrapper {
+            position: relative;
+        }
+
+            .input-icon-wrapper i {
+                position: absolute;
+                left: 14px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #8a92a6;
+                pointer-events: none;
+            }
+
+            .input-icon-wrapper .form-control-custom {
+                padding-left: 2.5rem;
+            }
+
+        .search-btn {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 0.85rem 2rem;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            box-shadow: 0 6px 20px rgba(102,126,234,0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%;
+            justify-content: center;
+        }
+
+            .search-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 30px rgba(102,126,234,0.4);
+                color: white;
+            }
+
+        /* Result Header */
+        .results-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .results-count {
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: #1a1d29;
+        }
+
+            .results-count span {
+                background: var(--primary-gradient);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+        /* Hotel Cards */
+        .hotel-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+
+            .hotel-card:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+            }
+
+        .hotel-image-wrapper {
+            position: relative;
+            height: 220px;
+            overflow: hidden;
+        }
+
+            .hotel-image-wrapper img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.5s;
+            }
+
+        .hotel-card:hover .hotel-image-wrapper img {
+            transform: scale(1.08);
+        }
+
+        .hotel-rating-badge {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(8px);
+            padding: 0.4rem 0.8rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #1a1d29;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+        }
+
+            .hotel-rating-badge i {
+                color: #ffc107;
+            }
+
+        .hotel-favorite {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            width: 38px;
+            height: 38px;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(8px);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #f5576c;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+        }
+
+            .hotel-favorite:hover {
+                background: var(--accent-gradient);
+                color: white;
+            }
+
+        .hotel-content {
+            padding: 1.4rem;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .hotel-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #1a1d29;
+            margin-bottom: 0.4rem;
+            line-height: 1.3;
+        }
+
+        .hotel-location {
+            color: #8a92a6;
+            font-size: 0.85rem;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .hotel-description {
+            color: #5a6478;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+            flex: 1;
+        }
+
+        .hotel-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-tag {
+            background: rgba(102,126,234,0.08);
+            color: #667eea;
+            padding: 0.25rem 0.7rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .hotel-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 1rem;
+            border-top: 1px solid #f0f2f5;
+        }
+
+        .hotel-price {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .hotel-price-label {
+            font-size: 0.7rem;
+            color: #8a92a6;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .hotel-price-value {
+            font-weight: 800;
+            font-size: 1.3rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hotel-price-night {
+            font-size: 0.8rem;
+            color: #8a92a6;
+            font-weight: 500;
+        }
+
+        .view-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.6rem 1.1rem;
+            background: var(--primary-gradient);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            box-shadow: 0 4px 14px rgba(102,126,234,0.25);
+        }
+
+            .view-btn:hover {
+                transform: translateY(-2px);
+                color: white;
+                box-shadow: 0 8px 20px rgba(102,126,234,0.4);
+            }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="page-header">
+        <div class="container position-relative">
+            <div class="header-flex">
+                <div>
+                    <h1><i class="bi bi-buildings-fill me-2"></i>Find Your Stay</h1>
+                    <p class="mb-0">Discover handpicked hotels around the world</p>
+                </div>
+                <a href="/Dashboard/Index" class="back-btn">
+                    <i class="bi bi-arrow-left"></i>
+                    <span>Back to Dashboard</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container pb-5">
+
+        <!-- Filter Card -->
+        <div class="filter-card">
+            <div class="filter-title">
+                <i class="bi bi-funnel-fill"></i>
+                <span>Search Hotels</span>
+            </div>
+            <form method="post" action="/Hotel/HotelList">
+                <div class="row g-3">
+
+                    <!-- City -->
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label form-label-custom">Destination</label>
+                        <div class="input-icon-wrapper">
+                            <i class="bi bi-geo-alt-fill"></i>
+                            <input type="text" name="city" class="form-control form-control-custom" placeholder="Paris, Milan..." required />
+                        </div>
+                    </div>
+
+                    <!-- Check-in -->
+                    <div class="col-lg-2 col-md-6">
+                        <label class="form-label form-label-custom">Check-in</label>
+                        <div class="input-icon-wrapper">
+                            <i class="bi bi-calendar-event"></i>
+                            <input type="date" name="checkIn" class="form-control form-control-custom" required/>
+                        </div>
+                    </div>
+
+                    <!-- Check-out -->
+                    <div class="col-lg-2 col-md-6">
+                        <label class="form-label form-label-custom">Check-out</label>
+                        <div class="input-icon-wrapper">
+                            <i class="bi bi-calendar-event"></i>
+                            <input type="date" name="checkOut" class="form-control form-control-custom" required />
+                        </div>
+                    </div>
+
+                    <!-- Persons -->
+                    <div class="col-lg-2 col-md-6">
+                        <label class="form-label form-label-custom">Guests</label>
+                        <div class="input-icon-wrapper">
+                            <i class="bi bi-people-fill"></i>
+                            <input type="number" min="1" value="2" name="adults" class="form-control form-control-custom" required />
+                        </div>
+                    </div>
+
+                    <!-- Currency -->
+                    <div class="col-lg-1 col-md-6">
+                        <label class="form-label form-label-custom">Currency</label>
+                        <select name="currency" class="form-select form-select-custom">
+                            <option value="EUR">EUR</option>
+                            <option value="USD">USD</option>
+                            <option value="TRY">TRY</option>
+                        </select>
+                    </div>
+
+                    <!-- Language -->
+                    <div class="col-lg-2 col-md-6">
+                        <label class="form-label form-label-custom">Language</label>
+                        <select name="language" class="form-select form-select-custom">
+                            <option value="en-us">English (US)</option>
+                            <option value="en-gb">English (UK)</option>
+                            <option value="fr">French</option>
+                            <option value="de">German</option>
+                            <option value="es">Spanish</option>
+                        </select>
+                    </div>
+
+                    <!-- Price Range -->
+                    <div class="col-lg-6 col-md-12">
+                        <label class="form-label form-label-custom">Price Range (per night)</label>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <div class="input-icon-wrapper">
+                                    <i class="bi bi-cash"></i>
+                                    <input type="number" name="minPrice" class="form-control form-control-custom" placeholder="Min price"  />
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="input-icon-wrapper">
+                                    <i class="bi bi-cash-stack"></i>
+                                    <input type="number" name="maxPrice" class="form-control form-control-custom" placeholder="Max price"  />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sort -->
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label form-label-custom">Sort By</label>
+                        <select class="form-select form-select-custom">
+                            <option>Recommended</option>
+                            <option>Price: Low to High</option>
+                            <option>Price: High to Low</option>
+                            <option>Rating</option>
+                        </select>
+                    </div>
+
+                    <!-- Search Button -->
+                    <div class="col-lg-3 col-md-6 d-flex align-items-end">
+                        <button type="submit" class="search-btn">
+                            <i class="bi bi-search"></i>
+                            Search Hotels
+                        </button>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+
+        @if (ViewBag.City != null)
+        {
+            <!-- Results Header -->
+            <div class="results-header">
+                <div class="results-count">
+                    <span>@hotels?.data?.hotels?.Length</span> hotels found in <span>@ViewBag.City</span>
+                </div>
+            </div>
+        }
+
+        <!-- Hotel Cards -->
+        <div class="row g-4">
+
+            @if (ViewBag.City == null)
+            {
+                <div class="col-12">
+                    <div style="text-align:center; padding: 5rem 2rem; color: #b0b8cc;">
+                        <i class="bi bi-search" style="font-size: 3.5rem; display:block; margin-bottom: 1.25rem; opacity:0.45;"></i>
+                        <p style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.4rem; color: #c0c8d8;">No results to display yet.</p>
+                        <p style="font-size: 0.9rem; font-weight: 400; color: #cdd3df;">Fill in the search form above and click <strong>Search Hotels</strong> to find your perfect stay.</p>
+                    </div>
+                </div>
+            }
+
+            @foreach (var item in hotels?.data?.hotels ?? Array.Empty<GetHotels.Hotel>())
+            {
+                <div class="col-lg-4 col-md-6">
+                    <div class="hotel-card">
+                        <div class="hotel-image-wrapper">
+                            @{
+                                var photoUrl = (item.property.photoUrls != null && item.property.photoUrls.Length > 0)
+                                ? item.property.photoUrls[0]
+                                : "https://placehold.co/600x400?text=No+Image";
+                            }
+                            <img src="@photoUrl" alt="Hotel" />
+                            <div class="hotel-favorite" style="width:150px">@item.property.reviewScoreWord</div>
+                            <div class="hotel-rating-badge"><i class="bi bi-star-fill"></i>@item.property.reviewScore</div>
+                        </div>
+                        <div class="hotel-content">
+                            <h5 class="hotel-name">@item.property.name</h5>
+                            <div class="hotel-location"><i class="bi bi-geo-alt-fill"></i>@item.property.wishlistName</div>
+                            <p class="hotel-description">@item.accessibilityLabel</p>
+                            <div class="hotel-footer">
+                                <div class="hotel-price">
+                                    <span class="hotel-price-label">From</span>
+                                    @{
+                                        var gp = item.property.priceBreakdown?.grossPrice;
+                                    }
+                                    @if (gp != null)
+                                    {
+                                        var symbol = gp.currency switch { "EUR" => "€", "USD" => "$", "TRY" => "₺", _ => gp.currency };
+                                        <span class="hotel-price-value">@symbol@gp.value.ToString("0.00") <span class="hotel-price-night">/ night</span></span>
+                                    }
+                                    else
+                                    {
+                                        <span class="hotel-price-value">— <span class="hotel-price-night">/ night</span></span>
+                                    }
+                                </div>
+                                @if (ViewBag.CheckIn!=null && ViewBag.CheckOut!=null)
+                                {
+                                    <a href="/Hotel/HotelDetail/@item.hotel_id?checkIn=@ViewBag.CheckIn&checkOut=@ViewBag.CheckOut&currency=@ViewBag.Currency&reviewScore=@item.property.reviewScore&reviewScoreWord=@item.property.reviewScoreWord&adults=@ViewBag.Adults" class="view-btn">View Details<i class="bi bi-arrow-right"></i></a>
+                                }
+                                else
+                                {
+
+                                    <a class="view-btn" style="opacity:0.4;cursor:not-allowed;" title="Please search first">
+                                        View Details<i class="bi bi-arrow-right"></i>
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

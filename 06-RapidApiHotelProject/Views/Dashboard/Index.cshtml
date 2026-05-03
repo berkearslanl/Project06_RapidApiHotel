@@ -1,0 +1,690 @@
+@using _06_RapidApiHotelProject.Models.Dashboard
+@{
+    Layout = null;
+    ViewData["Title"] = "Dashboard";
+    var weather = ViewBag.Weather as WeatherDto;
+    var exchange = ViewBag.Exchange as ExchangeDto;
+    var fuel = ViewBag.Fuel as FuelPriceDto;
+    var crypto = ViewBag.Crypto as CryptoDto.Rootobject;
+    var news = ViewBag.News as NewsDto.Rootobject;
+    var meal = ViewBag.Meal as MealDto;
+    var m = meal?.meals?.FirstOrDefault();
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard - World Insights</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --weather-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --exchange-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --fuel-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --crypto-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --news-gradient: linear-gradient(135deg, #5ee7df 0%, #b490ca 100%);
+            --meal-gradient: linear-gradient(135deg, #ffd89b 0%, #ff8c42 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f5f7fb;
+            background-image: radial-gradient(at 0% 0%, rgba(102,126,234,0.08) 0px, transparent 50%),
+                              radial-gradient(at 100% 100%, rgba(245,87,108,0.08) 0px, transparent 50%);
+            min-height: 100vh;
+            color: #2c3e50;
+        }
+
+        .dashboard-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 2.5rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 32px 32px;
+            box-shadow: 0 10px 40px rgba(102,126,234,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dashboard-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+
+        .dashboard-header::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -5%;
+            width: 250px;
+            height: 250px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 50%;
+        }
+
+        .dashboard-header h1 {
+            font-weight: 800;
+            font-size: 2.5rem;
+            letter-spacing: -1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-header p {
+            opacity: 0.9;
+            font-weight: 400;
+            font-size: 1.1rem;
+        }
+
+        .stat-card {
+            border: none;
+            border-radius: 20px;
+            background: white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 14px 40px rgba(0,0,0,0.1);
+        }
+
+        .stat-card .card-header-custom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid #f0f2f5;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            color: white;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+        }
+
+        .icon-weather { background: var(--weather-gradient); }
+        .icon-exchange { background: var(--exchange-gradient); }
+        .icon-fuel { background: var(--fuel-gradient); }
+        .icon-crypto { background: var(--crypto-gradient); }
+        .icon-news { background: var(--news-gradient); }
+        .icon-meal { background: var(--meal-gradient); }
+
+        .card-title-custom {
+            font-weight: 700;
+            font-size: 1.05rem;
+            margin: 0;
+            color: #1a1d29;
+        }
+
+        .card-subtitle-custom {
+            font-size: 0.78rem;
+            color: #8a92a6;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+
+        .stat-card .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Weather */
+        .weather-temp {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: var(--weather-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+        }
+
+        .weather-info {
+            color: #5a6478;
+            font-size: 0.95rem;
+        }
+
+        .weather-icon-img {
+            width: 80px;
+            height: 80px;
+        }
+
+        /* Exchange */
+        .exchange-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid #f5f6fa;
+        }
+
+        .exchange-row:last-of-type { border-bottom: none; }
+
+        .exchange-currency {
+            font-weight: 600;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .exchange-flag {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: white;
+            background: var(--exchange-gradient);
+        }
+
+        .exchange-value {
+            font-weight: 700;
+            color: #43e97b;
+            font-size: 1rem;
+        }
+
+        .exchange-meta {
+            font-size: 0.75rem;
+            color: #8a92a6;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px dashed #e8eaef;
+        }
+
+        /* Fuel */
+        .fuel-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.7rem 0.9rem;
+            background: #f9fafb;
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+            transition: background 0.2s;
+        }
+
+        .fuel-item:hover { background: #f1f3f7; }
+
+        .fuel-item:last-child { margin-bottom: 0; }
+
+        .fuel-label {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-weight: 500;
+            color: #5a6478;
+            font-size: 0.9rem;
+        }
+
+        .fuel-price {
+            font-weight: 700;
+            color: #fa709a;
+        }
+
+        /* Crypto */
+        .crypto-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.7rem 0;
+            border-bottom: 1px solid #f5f6fa;
+        }
+
+        .crypto-item:last-child { border-bottom: none; }
+
+        .crypto-symbol {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .crypto-badge {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--crypto-gradient);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.7rem;
+        }
+
+        .crypto-name { font-weight: 600; color: #2c3e50; font-size: 0.95rem; }
+        .crypto-price { font-weight: 700; color: #f5576c; }
+
+        /* News */
+        .news-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid #f0f2f5;
+            transition: background 0.2s;
+        }
+
+        .news-item:last-child { border-bottom: none; }
+        .news-item:hover { background: #fafbfc; }
+
+        .news-number {
+            min-width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--news-gradient);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .news-title {
+            color: #1a1d29;
+            font-weight: 600;
+            text-decoration: none;
+            display: block;
+            line-height: 1.4;
+            margin-bottom: 0.25rem;
+        }
+
+        .news-title:hover { color: #5ee7df; }
+
+        .news-meta {
+            font-size: 0.78rem;
+            color: #8a92a6;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        /* Meal */
+        .meal-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 14px;
+            margin-bottom: 1rem;
+        }
+
+        .meal-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #1a1d29;
+            margin-bottom: 0.5rem;
+        }
+
+        .meal-tag {
+            display: inline-block;
+            padding: 0.25rem 0.7rem;
+            background: rgba(255,140,66,0.1);
+            color: #ff8c42;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-right: 0.4rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .youtube-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.5rem 1rem;
+            background: #ff0000;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            margin-top: 0.5rem;
+        }
+
+        .youtube-btn:hover {
+            background: #cc0000;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 1.5rem;
+            color: #8a92a6;
+            font-size: 0.9rem;
+        }
+
+        .header-flex {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .hotel-cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.85rem 1.75rem;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: white;
+            text-decoration: none;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: 1.5px solid rgba(255,255,255,0.25);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+        }
+
+        .hotel-cta-btn:hover {
+            background: white;
+            color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+
+        .hotel-cta-btn i {
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="dashboard-header">
+    <div class="container position-relative">
+        <div class="header-flex">
+            <div>
+                <h1><i class="bi bi-grid-1x2-fill me-2"></i>World Insights</h1>
+                <p class="mb-0">Live data — weather, markets, news and more from around the globe</p>
+            </div>
+            <a href="/Hotel/HotelList" class="hotel-cta-btn">
+                <i class="bi bi-buildings-fill"></i>
+                <span>Browse Hotels</span>
+                <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+</header>
+
+<div class="container pb-5">
+    <div class="row g-4">
+
+        <!-- Weather -->
+        <div class="col-lg-4 col-md-6">
+            <div class="stat-card">
+                <div class="card-header-custom">
+                    <div>
+                        <p class="card-subtitle-custom">Live Weather</p>
+                        <h6 class="card-title-custom mt-1">@(weather?.location?.name ?? "—")</h6>
+                    </div>
+                    <div class="stat-icon icon-weather">
+                        <i class="bi bi-cloud-sun-fill"></i>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (weather != null)
+                    {
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <div class="weather-temp">@weather.current?.temp_c°</div>
+                                <div class="weather-info mt-2">
+                                    <i class="bi bi-geo-alt-fill me-1"></i>@weather.location?.country
+                                </div>
+                                <div class="weather-info">
+                                    <i class="bi bi-cloud me-1"></i>@weather.current?.condition?.text
+                                </div>
+                            </div>
+                            <img src="@weather.current?.condition?.icon" class="weather-icon-img" />
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="empty-state">No weather data available</div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Exchange -->
+        <div class="col-lg-4 col-md-6">
+            <div class="stat-card">
+                <div class="card-header-custom">
+                    <div>
+                        <p class="card-subtitle-custom">Exchange Rates</p>
+                        <h6 class="card-title-custom mt-1">Base: TRY</h6>
+                    </div>
+                    <div class="stat-icon icon-exchange">
+                        <i class="bi bi-currency-exchange"></i>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (exchange?.rates != null)
+                    {
+                        <div class="exchange-row">
+                            <span class="exchange-currency"><span class="exchange-flag">$</span>USD</span>
+                            <span class="exchange-value">@exchange.rates.USD</span>
+                        </div>
+                        <div class="exchange-row">
+                            <span class="exchange-currency"><span class="exchange-flag">€</span>EUR</span>
+                            <span class="exchange-value">@exchange.rates.EUR</span>
+                        </div>
+                        <div class="exchange-row">
+                            <span class="exchange-currency"><span class="exchange-flag">£</span>GBP</span>
+                            <span class="exchange-value">@exchange.rates.GBP</span>
+                        </div>
+                        <div class="exchange-row">
+                            <span class="exchange-currency"><span class="exchange-flag">¥</span>JPY</span>
+                            <span class="exchange-value">@exchange.rates.JPY</span>
+                        </div>
+                        @if (exchange.time_update != null)
+                        {
+                            <div class="exchange-meta">
+                                <i class="bi bi-clock me-1"></i>@exchange.time_update.time_utc.ToString("dd MMM yyyy, HH:mm")
+                                <span class="ms-2"><i class="bi bi-globe me-1"></i>@exchange.time_update.time_zone</span>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="empty-state">No exchange data available</div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Fuel -->
+        <div class="col-lg-4 col-md-6">
+            <div class="stat-card">
+                <div class="card-header-custom">
+                    <div>
+                        <p class="card-subtitle-custom">Fuel Prices</p>
+                        <h6 class="card-title-custom mt-1">USA · USD per gallon</h6>
+                    </div>
+                    <div class="stat-icon icon-fuel">
+                        <i class="bi bi-fuel-pump-fill"></i>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (fuel?.data != null)
+                    {
+                        <div class="fuel-item">
+                            <span class="fuel-label"><i class="bi bi-droplet-fill text-warning"></i>Gasoline</span>
+                            <span class="fuel-price">$@fuel.data.regular?.current.ToString("0.000")</span>
+                        </div>
+                        <div class="fuel-item">
+                            <span class="fuel-label"><i class="bi bi-droplet-fill text-info"></i>Mid-Grade</span>
+                            <span class="fuel-price">$@fuel.data.midGrade?.current.ToString("0.000")</span>
+                        </div>
+                        <div class="fuel-item">
+                            <span class="fuel-label"><i class="bi bi-droplet-fill text-danger"></i>Premium</span>
+                            <span class="fuel-price">$@fuel.data.premium?.current.ToString("0.000")</span>
+                        </div>
+                        <div class="fuel-item">
+                            <span class="fuel-label"><i class="bi bi-droplet-fill text-secondary"></i>Diesel</span>
+                            <span class="fuel-price">$@fuel.data.diesel?.current.ToString("0.000")</span>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="empty-state">No fuel data available</div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Crypto -->
+        <div class="col-lg-6 col-md-6">
+            <div class="stat-card">
+                <div class="card-header-custom">
+                    <div>
+                        <p class="card-subtitle-custom">Crypto Markets</p>
+                        <h6 class="card-title-custom mt-1">Live prices · TRY</h6>
+                    </div>
+                    <div class="stat-icon icon-crypto">
+                        <i class="bi bi-currency-bitcoin"></i>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @{
+                        var symbols = new[] { "BTC", "ETH", "SOL", "DOGECOIN" };
+                        var filtered = crypto?.data?.tokens?.Where(x => symbols.Contains(x.symbol)).ToList();
+                    }
+                    @if (filtered != null && filtered.Any())
+                    {
+                        foreach (var token in filtered)
+                        {
+                            <div class="crypto-item">
+                                <span class="crypto-symbol">
+                                    <span class="crypto-badge">@token.symbol.Substring(0, Math.Min(3, token.symbol.Length))</span>
+                                    <span class="crypto-name">@token.symbol</span>
+                                </span>
+                                <span class="crypto-price">@token.price ₺</span>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="empty-state">No crypto data available</div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Meal -->
+        <div class="col-lg-6 col-md-6">
+            <div class="stat-card">
+                <div class="card-header-custom">
+                    <div>
+                        <p class="card-subtitle-custom">Meal of the Day</p>
+                        <h6 class="card-title-custom mt-1">Today's Recipe</h6>
+                    </div>
+                    <div class="stat-icon icon-meal">
+                        <i class="bi bi-egg-fried"></i>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (m != null)
+                    {
+                        <img src="@m.strMealThumb" class="meal-image" alt="@m.strMeal" />
+                        <div class="meal-name">@m.strMeal</div>
+                        <span class="meal-tag"><i class="bi bi-tag-fill me-1"></i>@m.strCategory</span>
+                        <span class="meal-tag"><i class="bi bi-globe-americas me-1"></i>@m.strArea</span>
+                        @if (!string.IsNullOrEmpty(m.strYoutube))
+                        {
+                            <div>
+                                <a href="@m.strYoutube" target="_blank" class="youtube-btn">
+                                    <i class="bi bi-youtube"></i> Watch Recipe
+                                </a>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="empty-state">No meal data available</div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- News -->
+        <div class="col-12">
+            <div class="stat-card">
+                <div class="card-header-custom">
+                    <div>
+                        <p class="card-subtitle-custom">Top Headlines</p>
+                        <h6 class="card-title-custom mt-1">Latest news from around the world</h6>
+                    </div>
+                    <div class="stat-icon icon-news">
+                        <i class="bi bi-newspaper"></i>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (news?.data != null && news.data.Any())
+                    {
+                        var i = 1;
+                        foreach (var article in news.data.Take(5))
+                        {
+                            <div class="news-item">
+                                <div class="news-number">@i</div>
+                                <div class="flex-grow-1">
+                                    <a href="@article.link" target="_blank" class="news-title">@article.title</a>
+                                    <div class="news-meta">
+                                        @if (!string.IsNullOrEmpty(article.source_favicon_url))
+                                        {
+                                            <img src="@article.source_favicon_url" style="width:14px;height:14px;border-radius:3px;" />
+                                        }
+                                        <span><i class="bi bi-building me-1"></i>@article.source_name</span>
+                                        <span><i class="bi bi-clock me-1"></i>@article.published_datetime_utc.ToString("dd MMM yyyy, HH:mm")</span>
+                                    </div>
+                                </div>
+                            </div>
+                            i++;
+                        }
+                    }
+                    else
+                    {
+                        <div class="empty-state">No news available</div>
+                    }
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

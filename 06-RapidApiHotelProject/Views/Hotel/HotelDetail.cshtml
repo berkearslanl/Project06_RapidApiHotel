@@ -1,0 +1,776 @@
+@{
+    Layout = null;
+    ViewData["Title"] = "Hotel Detail";
+
+    var hotelDetail = ViewBag.HotelDetail as GetHotelDetail.Rootobject;
+
+    var d = hotelDetail?.data;
+
+    var photos = ViewBag.Photos as List<GetHotelDetailPhotos.Datum>;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hotel Detail — Luxury Stay</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --accent-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gold-gradient: linear-gradient(135deg, #ffd89b 0%, #ff8c42 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f5f7fb;
+            background-image: radial-gradient(at 0% 0%, rgba(102,126,234,0.08) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(245,87,108,0.08) 0px, transparent 50%);
+            min-height: 100vh;
+            color: #2c3e50;
+        }
+
+        /* Header */
+        .page-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 32px 32px;
+            box-shadow: 0 10px 40px rgba(102,126,234,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+            .page-header::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                right: -10%;
+                width: 400px;
+                height: 400px;
+                background: rgba(255,255,255,0.1);
+                border-radius: 50%;
+            }
+
+        .header-flex {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.85rem 1.75rem;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            color: white;
+            text-decoration: none;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: 1.5px solid rgba(255,255,255,0.25);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+            .back-btn:hover {
+                background: white;
+                color: #667eea;
+                transform: translateY(-2px);
+                box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            }
+
+        .breadcrumb-custom {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-bottom: 0.4rem;
+        }
+
+            .breadcrumb-custom a {
+                color: white;
+                text-decoration: none;
+                opacity: 0.8;
+            }
+
+                .breadcrumb-custom a:hover {
+                    opacity: 1;
+                }
+
+        .page-header h1 {
+            font-weight: 800;
+            font-size: 2rem;
+            letter-spacing: -1px;
+            margin-bottom: 0;
+        }
+
+        /* Photo Gallery */
+        .photo-gallery {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 12px;
+            height: 460px;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+        }
+
+            .photo-gallery img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                cursor: pointer;
+                transition: transform 0.5s, filter 0.3s;
+            }
+
+                .photo-gallery img:hover {
+                    transform: scale(1.05);
+                    filter: brightness(1.05);
+                }
+
+        .photo-main {
+            grid-row: 1 / 3;
+            position: relative;
+        }
+
+        .photo-tag {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            padding: 0.45rem 0.9rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: #1a1d29;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+        }
+
+            .photo-tag i {
+                color: #f5576c;
+            }
+
+        .more-photos {
+            position: absolute;
+            bottom: 14px;
+            right: 14px;
+            background: rgba(0,0,0,0.65);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 0.55rem 1rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+            .more-photos:hover {
+                background: rgba(0,0,0,0.85);
+            }
+
+        /* Cards */
+        .info-card {
+            background: white;
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+            border: 1px solid rgba(102,126,234,0.05);
+        }
+
+        .section-title {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #1a1d29;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+        }
+
+        .section-title-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: var(--primary-gradient);
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.05rem;
+        }
+
+        /* Hotel Title Block */
+        .hotel-title-block {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #f0f2f5;
+            margin-bottom: 1.5rem;
+        }
+
+        .hotel-stars {
+            display: inline-flex;
+            gap: 0.15rem;
+            color: #ffc107;
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .hotel-name-big {
+            font-weight: 800;
+            font-size: 2.1rem;
+            color: #1a1d29;
+            letter-spacing: -1px;
+            line-height: 1.15;
+            margin-bottom: 0.5rem;
+        }
+
+        .hotel-address {
+            color: #5a6478;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin-bottom: 0.4rem;
+        }
+
+            .hotel-address i {
+                color: #667eea;
+            }
+
+        .hotel-quick-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.8rem;
+        }
+
+        .quick-tag {
+            background: rgba(102,126,234,0.08);
+            color: #667eea;
+            padding: 0.3rem 0.85rem;
+            border-radius: 8px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        /* Score Badge */
+        .score-block {
+            text-align: center;
+            min-width: 160px;
+        }
+
+        .score-badge {
+            background: var(--primary-gradient);
+            color: white;
+            border-radius: 18px;
+            padding: 1.1rem 1.4rem;
+            box-shadow: 0 8px 24px rgba(102,126,234,0.35);
+        }
+
+        .score-value {
+            font-size: 2.4rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .score-word {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-top: 0.3rem;
+        }
+
+        .score-count {
+            color: #5a6478;
+            font-size: 0.83rem;
+            margin-top: 0.6rem;
+            font-weight: 500;
+        }
+
+        /* Description */
+        .description-text {
+            color: #5a6478;
+            font-size: 0.97rem;
+            line-height: 1.75;
+        }
+
+        /* Booking Info Card */
+        .booking-card {
+            background: white;
+            border-radius: 24px;
+            padding: 1.75rem;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.05);
+            border: 1px solid rgba(102,126,234,0.05);
+            position: sticky;
+            top: 1.5rem;
+        }
+
+        .price-block {
+            text-align: center;
+            padding: 1.25rem 0;
+            border-bottom: 1px solid #f0f2f5;
+            margin-bottom: 1.25rem;
+        }
+
+        .price-label {
+            color: #8a92a6;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            margin-bottom: 0.35rem;
+        }
+
+        .price-value-big {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+        }
+
+        .price-night {
+            color: #8a92a6;
+            font-size: 0.9rem;
+            margin-top: 0.3rem;
+            font-weight: 500;
+        }
+
+        .booking-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.8rem 0;
+            border-bottom: 1px dashed #f0f2f5;
+        }
+
+            .booking-row:last-of-type {
+                border-bottom: none;
+            }
+
+        .booking-label {
+            color: #5a6478;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+
+            .booking-label i {
+                color: #667eea;
+            }
+
+        .booking-value {
+            font-weight: 700;
+            color: #1a1d29;
+            font-size: 0.92rem;
+        }
+
+        .reserve-btn {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 0.95rem;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 1rem;
+            width: 100%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            box-shadow: 0 6px 20px rgba(102,126,234,0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 1.25rem;
+        }
+
+            .reserve-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 30px rgba(102,126,234,0.4);
+                color: white;
+            }
+
+        .save-btn {
+            background: transparent;
+            color: #667eea;
+            border: 1.5px solid rgba(102,126,234,0.3);
+            padding: 0.7rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            width: 100%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+            margin-top: 0.6rem;
+        }
+
+            .save-btn:hover {
+                background: rgba(102,126,234,0.06);
+                border-color: #667eea;
+            }
+
+        /* Amenities */
+        .amenities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 0.85rem;
+        }
+
+        .amenity-item {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            padding: 0.75rem 1rem;
+            background: #f9fafb;
+            border-radius: 12px;
+            font-size: 0.88rem;
+            color: #2c3e50;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+            .amenity-item:hover {
+                background: rgba(102,126,234,0.08);
+                color: #667eea;
+            }
+
+            .amenity-item i {
+                color: #667eea;
+                font-size: 1.1rem;
+            }
+
+        /* Score Breakdown */
+        .score-breakdown {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+
+        .score-bar-item {
+            background: #f9fafb;
+            padding: 1rem;
+            border-radius: 14px;
+        }
+
+        .score-bar-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .score-bar-track {
+            height: 8px;
+            background: #e8eaef;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .score-bar-fill {
+            height: 100%;
+            background: var(--primary-gradient);
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="page-header">
+        <div class="container position-relative">
+            <div class="header-flex">
+                <div>
+                    <div class="breadcrumb-custom">
+                        <a href="/Dashboard/Index"><i class="bi bi-house-fill"></i> Home</a>
+                        <i class="bi bi-chevron-right mx-1" style="font-size:0.7rem;"></i>
+                        <a href="/Hotel/HotelList">Hotels</a>
+                        <i class="bi bi-chevron-right mx-1" style="font-size:0.7rem;"></i>
+                        <span>Detail</span>
+                    </div>
+                    <h1><i class="bi bi-buildings-fill me-2"></i>Hotel Detail</h1>
+                </div>
+                <a href="/Hotel/HotelList" class="back-btn">
+                    <i class="bi bi-arrow-left"></i>
+                    <span>Back to All Hotels</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container pb-5">
+
+        <!-- Photo Gallery -->
+        @if (photos != null && photos.Count > 0)
+        {
+            <div class="photo-gallery">
+                <div class="photo-main">
+                    <img src="@photos[0].url" alt="Hotel main" />
+                    <div class="photo-tag"><i class="bi bi-camera-fill"></i>Main View</div>
+                </div>
+                @if (photos.Count > 1)
+                {
+                    <img src="@photos[1].url" alt="Photo 2" />
+                }
+                @if (photos.Count > 2)
+                {
+                    <img src="@photos[2].url" alt="Photo 3" />
+                }
+                @if (photos.Count > 3)
+                {
+                    <img src="@photos[3].url" alt="Photo 4" />
+                }
+                @if (photos.Count > 4)
+                {
+                    <div style="position:relative;">
+                        <img src="@photos[4].url" alt="Photo 5" />
+                        <button class="more-photos"><i class="bi bi-images"></i> View All Photos</button>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="photo-gallery" style="height:200px;display:flex;align-items:center;justify-content:center;background:#f0f2f5;border-radius:24px;margin-bottom:2rem;">
+                <span style="color:#aaa;"><i class="bi bi-image me-2"></i>No photos available</span>
+            </div>
+        }
+
+        <div class="row g-4">
+
+            <!-- LEFT: Hotel Info -->
+            <div class="col-lg-8">
+
+                <!-- Hotel Title Card -->
+                <div class="info-card">
+                    <div class="hotel-title-block">
+                        <div>
+                            <div class="hotel-stars">
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                            </div>
+                            <h2 class="hotel-name-big">@(d?.hotel_name ?? "-")</h2>
+                            <div class="hotel-address">
+                                <i class="bi bi-geo-alt-fill"></i>
+                                <span>@(d?.address ?? "-"), @(d?.city ?? "-")</span>
+                            </div>
+                            <div class="hotel-quick-tags">
+                                <span class="quick-tag"><i class="bi bi-check-circle-fill"></i>Free Cancellation</span>
+                                <span class="quick-tag"><i class="bi bi-wifi"></i>Free WiFi</span>
+                                <span class="quick-tag"><i class="bi bi-cup-hot-fill"></i>Breakfast Included</span>
+                            </div>
+                        </div>
+                        <div class="score-block">
+                            <div class="score-badge">
+                                <div class="score-value">@ViewBag.ReviewScore</div>
+                                <div class="score-word">@ViewBag.ReviewScoreWord</div>
+                            </div>
+                            <div class="score-count"><i class="bi bi-chat-square-text-fill me-1"></i>@(d?.review_nr ?? 0) reviews</div>
+                        </div>
+                    </div>
+
+                    <div class="description-text">
+                        @if (!string.IsNullOrEmpty(d?.description))
+                        {
+                            @d.description
+                        }
+                        else
+                        {
+                            <span style="color:#aaa;">No description available.</span>
+                        }
+                    </div>
+                </div>
+
+                <!-- Hotel Highlights Card -->
+                <div class="info-card">
+                    <h3 class="section-title">
+                        <span class="section-title-icon"><i class="bi bi-stars"></i></span>
+                        Hotel Highlights
+                    </h3>
+                    <div class="amenities-grid">
+                        @if (d?.top_ufi_benefits != null && d.top_ufi_benefits.Any())
+                        {
+                            foreach (var benefit in d.top_ufi_benefits)
+                            {
+                                <div class="amenity-item">
+                                    <i class="bi bi-patch-check-fill"></i>@benefit.translated_name
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div style="color:#aaa;">No highlights available.</div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Amenities Card -->
+                <div class="info-card">
+                    <h3 class="section-title">
+                        <span class="section-title-icon"><i class="bi bi-grid-fill"></i></span>
+                        Amenities & Features
+                    </h3>
+                    <div class="amenities-grid">
+                        @if (d?.facilities_block?.facilities != null && d.facilities_block.facilities.Any())
+                        {
+                            foreach (var facility in d.facilities_block.facilities)
+                            {
+                                <div class="amenity-item">
+                                    <i class="bi bi-check-circle-fill"></i>@facility.name
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div style="color:#aaa;">No facilities data available.</div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Score Breakdown -->
+                <div class="info-card">
+                    <h3 class="section-title">
+                        <span class="section-title-icon"><i class="bi bi-graph-up-arrow"></i></span>
+                        Guest Reviews
+                    </h3>
+                    <div class="score-breakdown">
+                        <div class="score-bar-item">
+                            <div class="score-bar-label"><span>Cleanliness</span><span>9.5</span></div>
+                            <div class="score-bar-track"><div class="score-bar-fill" style="width:95%"></div></div>
+                        </div>
+                        <div class="score-bar-item">
+                            <div class="score-bar-label"><span>Comfort</span><span>9.3</span></div>
+                            <div class="score-bar-track"><div class="score-bar-fill" style="width:93%"></div></div>
+                        </div>
+                        <div class="score-bar-item">
+                            <div class="score-bar-label"><span>Location</span><span>9.7</span></div>
+                            <div class="score-bar-track"><div class="score-bar-fill" style="width:97%"></div></div>
+                        </div>
+                        <div class="score-bar-item">
+                            <div class="score-bar-label"><span>Facilities</span><span>9.0</span></div>
+                            <div class="score-bar-track"><div class="score-bar-fill" style="width:90%"></div></div>
+                        </div>
+                        <div class="score-bar-item">
+                            <div class="score-bar-label"><span>Staff</span><span>9.6</span></div>
+                            <div class="score-bar-track"><div class="score-bar-fill" style="width:96%"></div></div>
+                        </div>
+                        <div class="score-bar-item">
+                            <div class="score-bar-label"><span>Value</span><span>8.8</span></div>
+                            <div class="score-bar-track"><div class="score-bar-fill" style="width:88%"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT: Booking Card -->
+            <div class="col-lg-4">
+                <div class="booking-card">
+                    <div class="price-block">
+                        <div class="price-label">Starting from</div>
+                        @{
+                            var gp = d?.product_price_breakdown?.gross_amount_per_night;
+                            var symbol = gp?.currency switch { "EUR" => "€", "USD" => "$", "TRY" => "₺", _ => gp?.currency };
+
+                            int nights = 1;
+                            if (DateTime.TryParse((string)ViewBag.CheckIn, out var ciDate) &&
+                                DateTime.TryParse((string)ViewBag.CheckOut, out var coDate))
+                            {
+                                var diff = (int)(coDate - ciDate).TotalDays;
+                                if (diff > 0) nights = diff;
+                            }
+
+                            string totalStr = "-";
+                            if (gp != null)
+                            {
+                                var total = gp.value * nights;
+                                totalStr = $"{symbol}{total.ToString("0.00")}";
+                            }
+                        }
+                        <div class="price-value-big">@symbol@(gp?.value.ToString("0.00") ?? "-")</div>
+                        <div class="price-night">per night · taxes included</div>
+                    </div>
+
+                    <div class="booking-row">
+                        <span class="booking-label"><i class="bi bi-calendar-event"></i>Check-in</span>
+                        <span class="booking-value">@(ViewBag.CheckIn ?? "-")</span>
+                    </div>
+                    <div class="booking-row">
+                        <span class="booking-label"><i class="bi bi-calendar-event"></i>Check-out</span>
+                        <span class="booking-value">@(ViewBag.CheckOut ?? "-")</span>
+                    </div>
+                    <div class="booking-row">
+                        <span class="booking-label"><i class="bi bi-moon-stars-fill"></i>Nights</span>
+                        <span class="booking-value">@nights night@(nights != 1 ? "s" : "")</span>
+                    </div>
+                    <div class="booking-row">
+                        <span class="booking-label"><i class="bi bi-people-fill"></i>Guests</span>
+                        <span class="booking-value">@ViewBag.Adults Adults</span>
+                    </div>
+                    <div class="booking-row">
+                        <span class="booking-label"><i class="bi bi-door-closed-fill"></i>Rooms</span>
+                        <span class="booking-value">1 Room</span>
+                    </div>
+                    <div class="booking-row">
+                        <span class="booking-label"><i class="bi bi-receipt"></i>Total</span>
+                        <span class="booking-value" style="color:#667eea;font-size:1.15rem;">@totalStr</span>
+                    </div>
+
+                    <button class="reserve-btn">
+                        <i class="bi bi-check2-circle"></i>Reserve Now
+                    </button>
+                    <button class="save-btn">
+                        <i class="bi bi-heart"></i>Save to Favorites
+                    </button>
+
+                    <div style="margin-top:1.25rem; padding-top:1.25rem; border-top:1px solid #f0f2f5; text-align:center; color:#8a92a6; font-size:0.78rem;">
+                        <i class="bi bi-shield-check me-1"></i>Free cancellation up to 24h before check-in
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
