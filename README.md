@@ -103,3 +103,18 @@ Seçilen otel için kapsamlı bilgi sunumu:
 ```json
 dotnet run
 ```
+
+---
+
+📸Ekran Görüntüleri
+> Otel Listesi
+> <img width="1920" height="5462" alt="hotellist" src="https://github.com/user-attachments/assets/a9dfca62-3c5d-4de0-9497-f3ec4adcce92" />
+
+> Filtreleme
+> <img width="1892" height="908" alt="filtreleme" src="https://github.com/user-attachments/assets/8e0e80cb-15e8-4ef0-8251-55ef1ad90183" />
+
+>Otel Detayı
+> <img width="1920" height="2460" alt="hoteldetail" src="https://github.com/user-attachments/assets/3a28e356-1800-4345-bf6a-727f20c70d48" />
+
+> Dashboard
+> <img width="1920" height="2058" alt="dashboard" src="https://github.com/user-attachments/assets/19deab54-c4f1-4fe0-9c1a-b4eea16ad480" />
