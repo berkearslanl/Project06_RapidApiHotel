@@ -22,7 +22,7 @@ namespace _06_RapidApiHotelProject.Controllers
         [HttpPost]
         public async Task<IActionResult> HotelList(string city, string checkIn, string checkOut, int adults, string currency, string language, int minPrice, int maxPrice)
         {
-            //destination id alma
+            //destination id alma işlemi
             var apiKey = _configuration["RapidApi2:ApiKey2"];
             var host = "booking-com15.p.rapidapi.com";
 
